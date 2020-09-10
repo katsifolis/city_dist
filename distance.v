@@ -20,7 +20,7 @@ fn read_cities(file_name string) int {
 	f := os.read_lines(file_name) or {
 		panic(err)
 	}
-	mut w := os.create('co.json') or {
+	mut w := os.create('cities.json') or {
 		panic('Cannot open or create file')
 		return -1
 	}
@@ -28,7 +28,7 @@ fn read_cities(file_name string) int {
 	for city in f {
 		c := city.split('\t')
 		country := c[8].str()
-		name := c[1].str().replace('"', '').replace('"', '')
+		name := c[1].str().replace('"', '').replace('"', '') // Asciiname
 		lat := c[4].str()
 		lon := c[5].str()
 		b := '{ "country" : "$country", "name": "$name", "lat" : "$lat", "lon" : "$lon" },'
@@ -43,7 +43,8 @@ fn deg2rad(deg f64) f64 {
 	return deg * (math.pi / 180)
 }
 
-fn calculate_distance(lat1, lon1, lat2, lon2 f64) f64 {
+// calculate_distance follows the Haversine Formula
+fn calculate_distance(lat1, lon1, lat2, lon2 f64) int {
 
 	r := 6371 // Radius of earth in km
 	d_lat := deg2rad(lat2-lat1)  // deg2rad below
@@ -53,7 +54,7 @@ fn calculate_distance(lat1, lon1, lat2, lon2 f64) f64 {
 	c := 2 * math.atan2(math.sqrt(a), math.sqrt(1-a)) 
 	d := r * c // Distance in km
 
-	return d
+	return int(d)
 
 }
 
@@ -65,7 +66,7 @@ fn main() {
 		return
 	}
 
-	f := os.read_file('./cities.json') or {
+	f := os.read_file('./co.json') or {
 		panic(err)
 		return
 	}
@@ -81,31 +82,35 @@ fn main() {
 	from, to :=  os.args[1], os.args[2]
 	for city in cities {
 		if from.capitalize() == city.name && flag == true {
-			println(city.lat)
-			println(city.lon)
 			lat1 = city.lat.f64()
 			lon1 = city.lon.f64()
+//			println("city 1")
+//			println(lat1)
+//			println(lon1)
+//			println("")
 			flag = false
 			
 		}
 		if to.capitalize() == city.name && flag1 == true{
-			print(city.name)
 			lat2 = city.lat.f64()
 			lon2 = city.lon.f64()
+//			println("city 2")
+//			println(lat2)
+//			println(lon2)
+//			println("")
 			flag1 = false
 		}
 
 		if flag == false && flag1 == false {
-			print('hi')
 			break
 		}
 	}
 
 	d := calculate_distance(lat1, lon1, lat2, lon2)
 
-	print(" Distance between $from -> $to is $d km \n")
+	print("Distance between $from -> $to is $d km \n")
 
 	// This is for reading the files and constructing the json file
-	// _ := read_cities(flname)
-	// println('Loading cities ..')
+	//_ := read_cities(flname)
+	//println('Loading cities ..')
 }
