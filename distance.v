@@ -66,7 +66,7 @@ fn main() {
 		return
 	}
 
-	f := os.read_file('./cities.json') or {
+	f := os.read_file('./co.json') or {
 		panic(err)
 		return
 	}
